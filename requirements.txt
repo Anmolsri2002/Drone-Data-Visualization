@@ -1,0 +1,4 @@
+Flask
+pandas
+plotly
+gunicorn==19.7.1
