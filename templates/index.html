@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Air Quality Data Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://images.pexels.com/photos/1209978/pexels-photo-1209978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .navbar .logo {
+            font-size: 28px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .navbar .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        .nav-buttons button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        .content {
+            background-color: #2c2c2c;
+            color: #f4f4f9;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
+        }
+
+        .content h1 {
+            font-size: 42px;
+            color: #f4f4f9;
+        }
+
+        .fancy-text {
+            font-size: 26px;
+            margin-top: 20px;
+            color: #8e44ad;
+            font-style: italic;
+        }
+        .text{
+            font-size: 18px;
+            color:#555;
+            font-style: italic;
+        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px;  }
+        h1 { color: #f2f2f2; }
+        #upload-form {
+             margin-bottom: 20px;
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             gap: 10px;
+        }
+        .custom-file-input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-file-input:hover {
+            background-color: #f0f0f0;
+        }
+        
+        
+        .btn-primary {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        
+        .dropdown-btn {
+            background-color: transparent;
+            color: #3f4739; /* Matches your current design */
+            border: 2px solid #fff;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-btn:hover {
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.9);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            padding: 12px 16px;
+            z-index: 1;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        
+        .show {
+            display: block;
+        }
+        .sensor h2{
+            color: #e74c3c;
+            padding: 50px;
+            text-align: center;
+        }
+        .sensor h4{
+            color: #2980b9;
+            padding : 20px;
+            margin: 0 0 20px 0;
+            font-weight: bold;        /* Makes the text bold */
+            font-size: 24px;          /* Increases font size for better visibility */
+            text-shadow: 1px 1px 2px #000000;
+        }
+        .sensation {
+            position: relative;
+            display: inline-block;
+            color: #c3511f;
+            cursor: pointer;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        
+        .sensation::after {
+            content: attr(data-tooltip); /* Tooltip text from data-tooltip attribute */
+            visibility: hidden;
+            font-size: 18px;
+            opacity: 0;
+            width: 220px;
+            background-color: rgba(64, 47, 56, 0.8); /* Dark background */
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            bottom: 100%; /* Position above the text */
+            left: 50%;
+            margin-left: -110px; /* Center the tooltip */
+            transition: opacity 0.3s ease;
+            z-index: 1; /* Ensures it appears above other elements */
+        }
+        
+       .h1{
+            color: #520400;
+       }
+        .sensation:hover::after {
+            visibility: visible;
+            opacity: 1;
+        }
+        .graph-container { background-color: white; padding: 30px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .file-label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        #file-input {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+
+        .sensor-section {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            margin: 40px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sensor-section h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .sensor-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sensor-link {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .sensor-link:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .sensor-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sensor-card {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .sensor-card:hover {
+            transform: translateX(10px);
+        }
+
+        .sensor-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .sensor-card p {
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Sensor Navigation Styling */
+        .sensor-nav-container {
+            background-color: #2c2c2c;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .sensor-nav-container h2 {
+            text-align: center;
+            color: #f4f4f9;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .sensor-box {
+            background-color: #3d3d3d;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid #4d4d4d;
+        }
+
+        .sensor-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        .sensor-box h3 {
+            color: #f4f4f9;
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .sensor-icon {
+            font-size: 2rem;
+            margin: 1rem 0;
+        }
+
+        .sensor-icon img {
+            width: 150px;
+            height: 150px; /* Set a fixed height */
+            object-fit: cover; /* Ensures the image covers the entire area without distortion */
+            border-radius: 50%; /* Makes the image round */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow for a raised effect */
+            border: 2px solid #ddd; /* Adds a border to make it visually attractive */
+        }
+
+        /* Sensor Information Styling */
+        .sensor-info-container {
+            margin: 2rem 0;
+        }
+
+        .sensor-info {
+            background-color: #2c2c2c;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            border-left: 5px solid #3498db;
+        }
+
+        .sensor-info h3 {
+            color: #f4f4f9;
+            margin: 0 0 1rem 0;
+            font-size: 1.4rem;
+        }
+
+        .sensor-info p {
+            color: #dcdcdc;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sensor-nav-container {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .sensor-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .sensor-info {
+                padding: 1.5rem;
+            }
+        }
+
+        .analyzer-section {
+            background-color: #2c2c2c;
+            color: #f4f4f9;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
+        }
+
+        .analyzer-section h1 {
+            font-size: 42px;
+            color: #f4f4f9;
+        }
+
+        .analyzer-section .fancy-text {
+            font-size: 26px;
+            margin-top: 20px;
+            color: #8e44ad;
+            font-style: italic;
+        }
+
+        .analyzer-section .text {
+            font-size: 18px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .analyzer-section .form-group {
+            margin-bottom: 20px;
+        }
+
+        .analyzer-section .form-group label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .analyzer-section .form-control {
+            display: inline-block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+
+        .analyzer-section .btn-primary {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .analyzer-section .btn-primary:hover {
+            background-color: #45a049;
+        }
+
+        /* Analyzer Section Styling */
+        .analyzer-section {
+            background-color: #2c2c2c; /* Dark grey background for the analyzer section */
+            color: #f4f4f9; /* Light text color for contrast */
+            padding: 40px; /* Padding for spacing */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+            margin: 20px 0; /* Margin for spacing */
+        }
+
+        .analyzer-section h1 {
+            font-size: 42px;
+            color: #f4f4f9; /* Light text color */
+            margin-bottom: 20px; /* Space below the heading */
+        }
+
+        .analyzer-section .form-group {
+            margin-bottom: 15px; /* Space between form groups */
+        }
+
+        .analyzer-section .form-control {
+            background-color: #3d3d3d; /* Darker grey for form inputs */
+            color: #f4f4f9; /* Light text color */
+            border: 1px solid #4d4d4d; /* Border color */
+        }
+
+        .analyzer-section .form-control:focus {
+            background-color: #4d4d4d; /* Slightly lighter grey on focus */
+            border-color: #3498db; /* Accent color for focus */
+            color: #f4f4f9; /* Light text color */
+        }
+
+        .analyzer-section .btn-primary {
+            background-color: #3498db; /* Button color */
+            border: none; /* Remove border */
+        }
+
+        .analyzer-section .btn-primary:hover {
+            background-color: #2980b9; /* Darker button color on hover */
+        }
+
+        /* Intro Section Styling */
+        .intro-section {
+            background-color: #2c2c2c; /* Dark grey background for the intro section */
+            color: #f4f4f9; /* Light text color for contrast */
+            padding: 40px; /* Padding for spacing */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+            margin: 20px 0; /* Margin for spacing */
+        }
+
+        .intro-section h1 {
+            font-size: 42px;
+            color: #f4f4f9; /* Light text color */
+            margin-bottom: 20px; /* Space below the heading */
+        }
+
+        .intro-section .fancy-text {
+            font-size: 26px;
+            margin-top: 20px;
+            color: #8e44ad; /* You can keep this color or change it to a lighter shade */
+            font-style: italic;
+        }
+
+        .intro-section h4 {
+            color: #dcdcdc; /* Slightly lighter grey for the paragraph text */
+            font-size: 18px; /* Font size for the h4 element */
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Air Quality Insights</div>
+        <div class="nav-buttons">
+            <div class="dropdown">
+                <button class="dropdown-btn" id="about-btn">Pre-Testing</button>
+                <div class="dropdown-content" id="about-content">
+                    <p>Arduino is widely used for data acquisition due to its simplicity, affordability, and versatility. It serves as a bridge between sensors and computers</p>
+                </div>
+            </div>
+            
+            <div class="dropdown">
+                <button class="dropdown-btn" id="contact-btn">Final PCB Implement</button>
+                <div class="dropdown-content" id="contact-content">
+                    <p>The Arduino Nano is a compact, versatile, and breadboard-friendly microcontroller board based on the ATmega328P or ATmega328 microcontroller.</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+        <div class="content">
+        <h1>Welcome to Air Quality Insights</h1>
+        <p class="fancy-text">Your trusted source for air quality updates and insights.</p>
+        <h4>Monitoring environmental conditions, particularly air quality, is becoming increasingly important for public health and sustainability. By using an Arduino board in combination with sensors, we can develop a cost-effective and efficient system to collect real-time environmental data, including the concentration of particulate matter (PM) in the air.</h4>
+    </div>
+
+    <!-- Sensor Navigation Section -->
+    <div class="sensor-nav-container">
+        <h2>Sensors Used For Air Particulates Detection</h2>
+        <div class="sensor-grid">
+            <div class="sensor-box" onclick="location.href='#dust-info'">
+                <h3>Dust Sensor</h3>
+                <div class="sensor-icon">
+                    <img src="https://m.media-amazon.com/images/I/61jRDyr20RL.jpg" alt="Dust Sensor" />
+                </div>
+            </div>
+            <div class="sensor-box" onclick="location.href='#co-info'">
+                <h3>CO Sensor</h3>
+                <div class="sensor-icon">
+                    <img src="https://cdn.shopify.com/s/files/1/0300/6424/6919/files/MQ-7-Gas-Sensor-Module_600x600.jpg?v=1588526990" alt="CO Sensor" />
+                </div>
+            </div>
+            <div class="sensor-box" onclick="location.href='#h2-info'">
+                <h3>H₂ Sensor</h3>
+                <div class="sensor-icon">
+                    <img src="data:image/jpeg;base64,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" alt="Dust Sensor" />
+                </div>
+            </div>
+            <div class="sensor-box" onclick="location.href='#dht11-info'">
+                <h3>Digital Temperature and Humidity Sensor</h3>
+                <div class="sensor-icon">
+                    <img src="data:image/jpeg;base64,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" alt="Dust Sensor" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sensor Information Section -->
+    <div class="sensor-info-container">
+        <div id="dust-info" class="sensor-info">
+            <h3>Dust Sensor (GP2Y1010AU0F)</h3>
+            <p>A dust sensor is a specialized device designed to detect and measure airborne particulate matter, including tiny particles such as dust, smoke, pollen, and other microscopic contaminants.
+                These sensors are essential for monitoring air quality in various settings, as exposure to fine particulate matter can pose significant health risks, particularly to the respiratory and cardiovascular systems. Dust sensors commonly work by using an optical method, where an infrared or laser light source is directed into an air chamber. When particles are present, they scatter the light, and a photodetector measures this scattered light. The amount of light scattering corresponds to the concentration and size of particles in the air, allowing the sensor to quantify the level of particulate matter.
+                The processed data can be displayed as particle concentration, often in micrograms per cubic meter (µg/m³) or as particulate matter (PM) values like PM2.5 or PM10, which represent particles with diameters of 2.5 micrometers or less, and 10 micrometers or less, respectively. These measurements provide real-time data on air quality, which is invaluable for applications such as industrial pollution control, indoor air quality management, and environmental health research. By detecting harmful particles, dust sensors enable individuals and organizations to take measures to reduce exposure, contributing to better public health and environmental protection.
+                Capable of measuring particulate matter from 0 to 500 μg/m³ with high accuracy.</p><br>
+            <p>For the GP2Y1010AU0F dust sensor, the combined percentage error due to temperature (T) and humidity (H) deviations is:<br>
+                
+                Total Error_Dust = | 0.005 * (T - T_ref) + 0.03 * (H - H_ref) | * 100<br>
+            
+            where:<br>
+            - T_ref = 20 - 25°C<br>
+            - H_ref = 40% - 50%<br></p>
+        </div>
+
+        <div id="co-info" class="sensor-info">
+            <h3>CO Sensor (MQ-7)</h3>
+            <p>The MQ-7 sensor is a widely used gas sensor specifically designed to detect carbon monoxide (CO) levels in the environment. This sensor operates on the principle of conductivity change in the presence of CO gas. When carbon monoxide gas is present, the sensor’s conductivity increases proportionally to the concentration of the gas. The MQ-7 is commonly used in applications such as air quality monitoring, industrial safety, and gas leakage detection systems due to its sensitivity, affordability, and ease of use. The MQ-7 sensor consists of a small heating element and an electrochemical sensor. Its working mechanism involves heating up the sensor element to an optimal temperature for CO gas detection, during which the gas is absorbed and causes a change in resistance, which is then measured and converted into an electrical signal that can be easily interpreted by a microcontroller or other reading systems. The MQ-7 sensor is noted for its high sensitivity to carbon monoxide within a range of 20 to 2000 parts per million (ppm), making it effective for both low and high levels of detection. The sensor requires a supply voltage, typically 5V, and has two operation modes: heating and reading mode. In heating mode, the sensor element is heated to approximately 5V for a specific duration, allowing it to detect CO. In reading mode, the voltage is lowered, enabling the sensor to output a voltage signal proportional to the CO concentration. This sensor is preferred for its robust design and affordability in CO detection projects, as it requires minimal calibration and provides reliable outputs. The MQ-7 sensor does, however, have some limitations, such as cross-sensitivity to other gases and the need for an initial warm-up time to reach its full sensitivity. It is often used with additional circuitry and filtering methods to ensure accurate and stable readings.</p><br>
+            <p>For the MQ7 sensor, the combined percentage error due to temperature (T) and humidity (H) deviations is:<br>
+                
+                Total Error_MQ7 = | 0.01 * (T - T_ref) + 0.02 * (H - H_ref) | * 100<br>
+            
+            where:
+            - T_ref = 20 - 25°C<br>
+            - H_ref = 40% - 60%<br>
+            </p>
+        </div>
+
+        <div id="h2-info" class="sensor-info">
+            <h3>H₂ Sensor (MQ-8)</h3>
+            <p>MQ8, often known as H-Conc, is a high-precision hydrogen gas sensor designed to detect hydrogen concentrations in various environments. This sensor operates on a principle where its internal metal-oxide semiconductor reacts with hydrogen, causing a measurable change in resistance. Its sensitivity is particularly well-suited for detecting hydrogen levels in the range of 100 to 10,000 ppm, making it reliable for monitoring hydrogen leaks or concentrations in industrial applications, safety systems, and scientific research. The MQ8 sensor is favored for its stability and quick response time, as it provides accurate measurements within seconds, ensuring prompt detection of hydrogen levels. It also has a robust design that can withstand fluctuating environmental conditions, including changes in temperature and humidity, which makes it versatile across different operational settings. The sensor’s output can be easily integrated into microcontrollers and other monitoring devices through an analog or digital signal. By calibrating the sensor, users can set threshold values to trigger alarms or other actions, enhancing the safety and efficiency of hydrogen-related applications.</p><br>
+            <p>MQ8 (Hydrogen Gas Sensor)<br>
+                For the MQ8 sensor, the combined percentage error due to temperature (T) and humidity (H) deviations is:<br>
+                
+                    Total Error_MQ8 = | 0.015 * (T - T_ref) + 0.025 * (H - H_ref) | * 100<br>
+                
+                where:<br>
+                - T_ref = 20 - 25°C<br>
+                - H_ref = 50% - 65%<br></p>
+        </div>
+
+        <div id="dht11-info" class="sensor-info">
+            <h3>Digital Temperature and Humidity Sensor (DHT-11)</h3>
+            <p>The DHT11 sensor is a popular and cost-effective sensor widely used for measuring temperature and humidity. It contains a thermistor and a capacitive humidity sensor, enabling it to provide digital output with fair accuracy. The sensor operates within a temperature range of 0 to 50 degrees Celsius and a humidity range of 20% to 90%. Its accuracy is approximately ±2 degrees Celsius for temperature and ±5% for humidity, which makes it suitable for general-purpose applications where precise measurements are not critical. The DHT11 sensor is easy to interface with microcontrollers such as Arduino, Raspberry Pi, and ESP8266 due to its single-wire communication protocol. It only requires one digital pin for data transmission, which simplifies wiring and makes it a good choice for compact or portable systems. The sensor takes about one second per reading, making it adequate for applications where real-time data isn’t required, such as environmental monitoring, home automation, and educational projects. Another benefit of the DHT11 sensor is its low power consumption, making it suitable for battery-operated projects. However, it has a lower resolution and slower response time compared to more advanced sensors like the DHT22, which offers better accuracy and a wider range. Despite its limitations, the DHT11 is a reliable and efficient option for basic temperature and humidity monitoring in environments where high precision isn’t necessary. Its affordability and ease of use make it a popular choice among hobbyists, students, and developers working on entry-level projects.</p>
+        </div>
+
+    </div>
+
+    <div class="analyzer-section">
+        <h1>Enhanced Air Quality Data Analyzer</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="file-input" class="file-label">Choose a file</label>
+                <input type="file" id="file-input" name="file" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="temperature">Temperature (°C)</label>
+                <input type="number" id="temperature" name="temperature" class="form-control" 
+                       step="0.1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="humidity">Humidity (%)</label>
+                <input type="number" id="humidity" name="humidity" class="form-control" 
+                       step="0.1" required>
+            </div>
+            
+            
+            <button type="submit" class="btn btn-primary">Upload and Analyze</button>
+               
+            
+        </form>
+    </div>
+
+    <!-- Add a loading indicator -->
+    <div id="loading" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <div id="graphs-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleDropdown(buttonId, contentId) {
+            document.getElementById(contentId).classList.toggle('show');
+        }
+    
+        document.getElementById('about-btn').addEventListener('click', function() {
+            toggleDropdown('about-btn', 'about-content');
+        });
+    
+        document.getElementById('contact-btn').addEventListener('click', function() {
+            toggleDropdown('contact-btn', 'contact-content');
+        });
+    
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-btn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+        $(document).ready(function() {
+            $('#upload-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Check if a file is selected
+                var fileInput = $('#file-input')[0];
+                if (fileInput.files.length === 0) {
+                    alert("Please select a file first!");
+                    return false;
+                }
+
+                var formData = new FormData(this);
+                
+                // Show loading indicator
+                $('#loading').show();
+                
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#loading').hide();
+                        if (response.status === 'success') {
+                            var newTab = window.open('/result', '_blank');
+                            newTab.focus();
+                        } else {
+                            alert("Error: " + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#loading').hide();
+                        alert("Upload failed: " + (xhr.responseJSON ? xhr.responseJSON.error : error));
+                    }
+                });
+            });
+
+            $('#altitude-analysis-btn').on('click', function(e) {
+                e.preventDefault();
+                
+                var fileInput = $('#file-input')[0];
+                if (fileInput.files.length === 0) {
+                    alert("Please select a file first!");
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                $('#loading').show();
+                
+                $.ajax({
+                    url: '/upload_altitude',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#loading').hide();
+                        if (response.status === 'success') {
+                            var newTab = window.open('/altitude_result', '_blank');
+                            newTab.focus();
+                        } else {
+                            alert("Error: " + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#loading').hide();
+                        alert("Upload failed: " + (xhr.responseJSON ? xhr.responseJSON.error : error));
+                    }
+                });
+            });
+
+            // Add file input change handler to show selected filename
+            $('#file-input').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                if (fileName) {
+                    $('.file-label').text('Selected: ' + fileName);
+                } else {
+                    $('.file-label').text('Choose a file');
+                }
+            });
+        });
+
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('.sensor-box').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('onclick').split("'")[1];
+                const target = document.querySelector(targetId);
+                
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
